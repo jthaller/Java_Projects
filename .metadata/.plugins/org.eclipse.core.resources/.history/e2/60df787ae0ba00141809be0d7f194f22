@@ -1,0 +1,334 @@
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
+
+
+
+
+
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
+import java.util.ArrayList;
+
+public class ShapeViewer{
+	private  ArrayList<Shape> shapes;
+	private double width;
+	private double height;
+	JFrame f = new JFrame();
+	Timer timer;
+	private int FPS;
+
+	public double getWidth()
+	{
+		return this.width;
+	}
+
+	public void setWidth(double w){
+		this.width = w;
+	}
+
+	public double getHeight(){
+		return this.height;
+	}
+
+	public void setHeight(double h){
+		this.height = h;
+	}
+
+	public int getFPS(){
+		return FPS;
+	}
+
+	public void setFPS(int FPS){
+		this.FPS = FPS;
+	}
+
+	public ShapeViewer(double width, double height) {	
+		this.width = width;
+		this.height = height;
+	}
+
+	public ArrayList<Shape> getShapes(){
+		return shapes;
+	}
+
+
+
+	public class ShapeComponent extends JComponent {
+		//private double theta = .1; //radians. default =.1
+		//private double height = getSize().getHeight();
+		//private double width = getSize().getWidth();
+		//this ^ should go elsewhere
+
+		public void paintComponent(Graphics g)
+		{
+			//recover Graphics2D
+			Graphics2D g2 = (Graphics2D) g;
+			//		Point2D.Double center = new Point2D.Double(getSize().getWidth()/2, getSize().getHeight()/2);
+			//I don't think the timer is running?
+			//how to fix/tell?
+			//okay well i just learned a few things
+			//1) you're not drawing your line for some reason
+			//2) paint component is getting called frequently enough
+			// I said print "a" whenever this method is called
+			//nothing happened at first
+			//then i resized the window which automtically calls repaint
+			// after doing that I saw "a"s butthe line didn't appear
+			// I don't rmember how to do this make it draw a box pleas hahao
+			// or anything really uh I did it before let me check the book mkay
+			//Rectangle a = new Rectangle(0,0,10,10);
+			//g2.draw(a);
+			//so we're drawing
+			//that means you're (lol) possibly drawing in the wrong spot? so lets see
+			for(int i=0; i < shapes.size(); i++ ){
+				//				ArrayList<Line2D.Double> shapes = ShapeViewer.getLines(i); 
+				//pretty much use useless. will prob delete later
+				for(int j=0; j < shapes.get(i).drawShape(width,height).size(); j++)
+				{
+					System.out.println(shapes.get(i).drawShape(width,height).get(j).getX1());
+					System.out.println(shapes.get(i).drawShape(width,height).get(j).getX2());
+					System.out.println(shapes.get(i).drawShape(width,height).get(j).getY1());
+					System.out.println(shapes.get(i).drawShape(width,height).get(j).getY2());
+
+
+					g2.draw(shapes.get(i).drawShape(width,height).get(j));
+				}
+				// okay so something is wrong with the visibility, lets try drawing something arbitraty
+				//this is where it would be drawn right? so  it's not getting here?
+				//or shapes is empty
+				// So um, what the fuck haha?
+				// whats width/height intialized to?
+			}
+
+		}
+
+	}
+
+	public void run(){
+
+		f.setSize(500,500);
+		//		f.setMinimumSize(new Dimension(50,100));
+		f.setTitle("Rotation Project");
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		timer = new Timer(FPS, (ActionListener) this); // other option is to make shapeviewer abstract and extent it to actionlistener
+		timer.start();
+
+		ShapeComponent comp = new ShapeComponent(); 
+		//Okay, in here do two things 1) deal with button layout if you're going to have more buttons
+		//2) put alllllll the action listeners (could declare them outside of the method but i don't think that matters)
+		//now, make slider and a timer (the slider clearl y chages the timer value) that every
+		// so often (couple times a second maybe) rotates all your shapes by some angle (arbitrary)
+
+		//Create the slider
+		int FPS_MIN = 0;
+		int FPS_MAX = 30;
+		int FPS_INIT = 5; //just so i can change around to mess with
+		JSlider speed = new JSlider(JSlider.HORIZONTAL,
+				FPS_MIN, FPS_MAX, FPS_INIT);
+		speed.addChangeListener(new SliderListenerSpeed()); //or (changelister) this
+		speed.setMajorTickSpacing(10);
+		speed.setMinorTickSpacing(2);
+		speed.setPaintTicks(true);
+		speed.setPaintLabels(true);
+		JLabel label = new JLabel("Speed");
+		f.add(label);
+
+
+		JSlider sides = new JSlider(JSlider.HORIZONTAL, 1, 10, 1);
+		sides.setMajorTickSpacing(9);
+		sides.setMinorTickSpacing(1);
+		sides.setPaintTicks(true);
+		sides.setPaintLabels(true);
+		sides.addChangeListener(new SliderListenerSides());
+
+
+		JButton rotateButton = new JButton("Rotate Line");
+		rotateButton.addActionListener(new RotateListener());
+
+		JButton colorButton = new JButton("Change Color");
+		colorButton.addActionListener(new ColorListener());
+
+		JButton addShapeButton = new JButton("Add Shape");
+		addShapeButton.addActionListener(new AddShapeListener());
+
+		JButton resetButton = new JButton("Reset");
+		resetButton.addActionListener(new ResetListener());
+
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.add(rotateButton);
+		buttonPanel.add(colorButton);
+		buttonPanel.add(addShapeButton);
+		buttonPanel.add(resetButton);
+
+		JPanel sliderPanel = new JPanel();
+		sliderPanel.add(sides);
+		sliderPanel.add(speed);
+
+
+		//that's probably this...
+		//Smart lol lets see what happens
+		ArrayList<Point2D.Double> points = new ArrayList<Point2D.Double>();
+		points.add(new Point2D.Double(0, 0)); //starting pt1
+		points.add(new Point2D.Double(f.getSize().getWidth(), f.getSize().getHeight())); //starting pt2
+		//youre an idiot
+		//no offence //already acknowledged
+		//you know why nothing was being drawn?
+		//well I think I told it the center was somewhere else
+		//thats not the problem lol
+		//well actually
+		// thats the next problem we're going to address
+		// or rather, you drew a line off the screen lol thtas why we couldn't see anything
+		// now as you saw, your "content pane"(I think?) looks kinda jenk and doesn't fill the whole space
+		// but we've got a couple of errors to adress before that.
+		// what do you think is next?
+		//well something is messed up with the line, in the sense that it doesn't go across, so the x,y seems off
+		//should probably go fix that
+		// whats the name of the project
+		//rotation project?
+		// how about we make something rotate before we worry about where it is on the screen?
+		// look at the values that spit out when we click rotate lol.
+		// you can't see a line rotating right? or can you? ( i don't)
+		// i kind of assumed those were the same problems. but the numbers are so different, they're prob diff 
+		//// the issues is eiher in rotate (in shape) or in where the center of the shape is.
+		//unless I changed the rotate in shape (i don't think i did), it used to be fine. I think it spit out 
+		//some radians that made sense for xy coords
+		Shape shape = new Shape(points);
+		shapes = new ArrayList<Shape>();
+		shapes.add(shape);
+		//God keeping track of all these pluralities is confusing lol ttry running
+
+
+
+		f.getContentPane().add(BorderLayout.CENTER, comp);
+		f.getContentPane().add(BorderLayout.NORTH, sliderPanel);
+		f.getContentPane().add(BorderLayout.SOUTH, buttonPanel);
+		//		f.add(comp);
+		f.setVisible(true);
+
+	}
+
+	class RotateListener implements ActionListener{
+		public void actionPerformed(ActionEvent e) {
+			rotate();
+			f.repaint();
+			//lol okay good just making sure you called repaint
+		}
+	}
+		//um what the fuck is going on here?
+		// 1) i'd suggest making rotate outside for good sytle( no one actually cares)
+		// 2) is this making a new timer every time a timer event occurs....uhhh damnit. I copied this bit from her code..
+		// what did i tell you about her code. hey you said the only thing she got right was the rotate method
+		// i said she got it to rotate, i didn't say she did it properly hahaa
+		// So um inside of run you're going to have to make timer
+		// and then use that with the slider, I really have no idea what teh fuck this is
+		// you can leave the action preformed method, thats nto wrong
+		// and i'd suggest moving rotate out
+		// (nless i forget how visibility works) in which case move it back in lol
+		// annd rotate should literall just be for(shapes){shapes.get(i).roate(.2 or something)
+		// so go do that haha I'm going to go do a chem problem, let me know once youv'e written this k have fun cheming
+	
+	public void rotate(){
+		for(int i=0; i < shapes.size(); i++ ){
+			shapes.get(i).rotate(.2); //might change .2 for smoothness idk
+		}
+	}
+
+
+	class SliderListenerSpeed implements ChangeListener {
+		public void stateChanged(ChangeEvent e) {
+			JSlider source = (JSlider)e.getSource();
+			if (!source.getValueIsAdjusting()) {
+				setFPS((int)source.getValue()); //this the best way????
+			}
+		}
+	}
+
+	class SliderListenerSides implements ChangeListener {
+		public void stateChanged(ChangeEvent e) {
+			JSlider source = (JSlider)e.getSource();
+			if (!source.getValueIsAdjusting()) {
+				//wtf do I update? 
+			}
+		}
+	}
+
+	class ColorListener implements ActionListener{
+		public void actionPerformed(ActionEvent event){
+			int red = (int) (Math.random() * 256);
+			int green = (int) (Math.random() * 256);
+			int blue = (int) (Math.random() * 256);
+
+			Color randomColor = new Color(red, green, blue);
+			//			for(int i=0; i < shapes.size(); i++ ){
+			//				shapes.get(i).setColor(randomColor); 
+			//shapes.setColor(randomColor); //yeah somethings off with this class/method
+			//for(int i=0;i<shapes.size();i++)
+			//shapes.get(i).setColor(randomColor);
+			//fix this later lol hmm
+		}
+	}
+
+
+	class AddShapeListener implements ActionListener{
+		public void actionPerformed(ActionEvent e){
+
+		}
+	}
+
+	class ResetListener implements ActionListener{
+		public void actionPerformed(ActionEvent e){
+			reset();
+		}
+	}
+
+
+
+	private void reset() {
+		//nothing seems to work. I want to just call run() again	
+	}
+
+
+
+
+	public static void main(String[] args){
+		//you're throwing a null pointers
+		//did you ever put anything into "shapes".....
+		//did you ever initialize it?
+		//its close to 500 thats fine
+		//so clearly, something is wrong
+		//1) youre ∆y = 0 so you would only draw a point
+		//2) 250000 seems like a bit of over kill but technicall shouldn't cause the error
+		//what code needs to be fixed?
+		//is something messing up where it thinks the center is?
+		// haven't looked into that yet, it could be an issue
+		// but one of your methods is really wrong right now
+		// I know what it is haha, i'm asking you to figure it out
+		//I wnat to say something is messing up inside the run
+		//hint: the issue isn't in this class
+		// / the issue we're going to fix first, there are multiple issues here too lol
+		// but the first one we need to isnt here
+		ShapeViewer a = new ShapeViewer(500,600);
+		a.run();
+	}
+
+}

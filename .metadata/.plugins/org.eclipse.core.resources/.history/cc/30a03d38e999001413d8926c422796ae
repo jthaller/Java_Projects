@@ -1,0 +1,81 @@
+import java.util.Scanner;
+
+public class Emulator extends Screen {
+
+	private static Scanner s = new Scanner(System.in);
+	private static Screen screen;
+
+	Emulator screen(
+
+			//	public String getStringFromList(){
+			//
+			//	}
+			//
+			//	public int getPosInt(){
+			//		return Math.abs(getInt());
+			//	}
+			//
+			//	public int getInt(){
+			//
+			//	}
+
+			public void Start(){
+				System.out.println("WELCOME TO THE SHAPES PROJECT \n-----------------------------");
+				createScreen();
+			}
+
+			public void createScreen(){
+
+				int num;
+				do
+				{
+					System.out.println("Please enter an integer <100 for the width of the screen");	
+					s.reset();
+					num = s.nextInt();
+
+				}
+				while(num >= 100 || num < 0);
+
+				//		if(num >= 0 && num <100){
+
+				setWidth((int)num);
+				//		}
+
+
+				do
+				{
+					System.out.println("Please enter an integer <100 for the height of the screen");
+					s.reset();
+					s.nextInt();
+				}
+				while(num >= 100 || num < 0);
+
+				//		if(num >= 0 && num <100){
+				setHeight((int)num);
+				//		}
+
+				do
+					int bordChar;
+				{
+					System.out.println("Please choose a single-character for the border");
+					s.reset();
+					s.next();
+				}
+				while(num >= 100 || num < 0);
+
+				chooseShape();
+			}
+
+			public void chooseShape(){
+				System.out.println("1. Horizontal Line \n 2. Vertical Line \n 3. Frame \n 4. Box \n 5. Text");
+
+			}
+
+
+			public static void main(String[] args){
+				Emulator e = new Emulator();
+				e.Start();
+
+			}
+
+}

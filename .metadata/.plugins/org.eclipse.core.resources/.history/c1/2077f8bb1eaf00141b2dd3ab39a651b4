@@ -1,0 +1,48 @@
+import java.awt.geom.Point2D.Double;
+import java.util.ArrayList;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+
+
+public class ShapeComponent extends JComponent {
+	double theta;
+	double height;
+	double width;
+	
+	
+	public void setTheta(double theta)
+	{
+		this.theta = theta;
+	}
+	
+	public void paintComponent(Graphics g)
+	{
+		//revover Graphics2D
+		Graphics2D g2 = (Graphics2D) g;
+		
+		Shape shape = new Shape(points,)
+		g2.drawShape(shape);
+		
+	}
+	
+//	public ShapeComponent(ArrayList<Double> shape) {
+//		super();
+//	}
+//
+//	public ShapeComponent(ArrayList<Double> shape, Double center) {
+//		super();
+//	}
+	
+	
+	
+	public static void main(String[] args){
+//		JFrame frame = new JFrame();
+//		frame.setSize(500,500);
+//		frame.setTitle("Shapes");
+//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+
+}

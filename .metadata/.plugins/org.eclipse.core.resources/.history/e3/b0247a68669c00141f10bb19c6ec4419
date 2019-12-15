@@ -1,0 +1,200 @@
+import java.util.Scanner;
+
+public class Emulator extends Screen {
+
+	private static Scanner s = new Scanner(System.in);
+	private static Screen board;
+
+	public static int getPosInt(String string){
+		int posInt;
+		do{
+			System.out.println(string);
+			while (!s.hasNextInt() || s.hasNext(" ")){ 
+				//while (!s.hasNextInt() || s.hasNext(" ") || s.hasNext("	") || s.hasNext"\/"); //test this later
+				System.out.println("Invalid Input");
+				System.out.println(string);
+				s.nextLine();}
+			posInt = s.nextInt();
+			s.nextLine();
+			if (posInt <= 100 && posInt >= 0)
+				return posInt;
+			System.out.println("Invalid Input");
+		}  while(true);
+	}
+
+	public static char getRealChar(String string){
+		Scanner r = new Scanner(System.in); 
+		do{
+			System.out.println(string);
+			//			s = r.nextLine();
+			if (r.hasNext())
+				return r.next().charAt(0);
+			else System.out.println("Invalid input");
+		}
+		while(true);
+	}
+
+	public static String getValidText(String string){
+		String entered;
+		Scanner r = new Scanner(System.in);
+		do
+		{
+			System.out.println(string);
+			//			Scanner r = new Scanner(System.in);  
+			entered = r.nextLine();
+			//			if (r.hasNext("	"))
+			entered.replace("	", " ");
+			return entered;
+			//                 else System.out.println("Invalid Input"); //
+		}
+		while(true);
+	}
+
+	public static int getShapeNumFromList(String string){
+		int chosen;
+		do{
+			System.out.println(string);
+
+			while (!s.hasNextInt()){ 
+				System.out.println("Invalid Input");
+				System.out.println(string);
+				s.nextLine();
+			}
+			chosen = s.nextInt();
+			if (chosen == 1 || chosen == 2 || chosen == 3 || chosen == 4 || chosen ==5 || chosen ==6)
+				return chosen;
+			else System.out.println("Invalid Input");
+		}
+		while(true);
+	}
+
+	public void run(){
+		System.out.println("WELCOME TO THE SHAPES PROJECT \n-----------------------------");
+		System.out.println("First Let's Create a Screen \n");
+		makeBoard();
+		board.draw();
+		do{
+			thingsToDo();
+			board.draw();
+		}
+		//		while(goAgain());
+		while(true);
+	}
+
+
+	public static void makeBoard(){
+		int h = getPosInt("Enter a height (positive integer less than or equal to 100)");
+		int w = getPosInt("Enter a Width (Positive integer less than or equal to 100)");
+		board = new Screen(h,w);
+	}
+
+	public static void thingsToDo(){ //maybe make an options menue where you can change charborder and clear screen and shit
+		System.out.println("\nHere are the shape options: \n 1. Horizontal Line \n 2. Vertical Line \n 3. Frame \n 4. Box \n 5. Text \n 6. More Options"); //make 6 options menue instead
+		int shapeChosen = getShapeNumFromList("Which shape you you like to draw? \n Choose a number from above");
+		if (shapeChosen == 1)
+			doHLine();
+		if (shapeChosen == 2)
+			doVLine();
+		if (shapeChosen == 3)
+			doFrame();
+		if (shapeChosen == 4)
+			doBox();
+		if (shapeChosen == 5)
+			doTextLine();
+		if (shapeChosen == 6)
+			optionsMenue();
+	}
+
+	public static void doHLine(){
+		int x = getPosInt("Please pick a valid x coordinate");
+		int y = getPosInt("Please pick a valid y coordinate");
+		int z = getPosInt("Please pick a size for the line");
+		HLine H = new HLine(z);
+		H.paintOn(board, x,y );
+		return;
+	}
+
+	public static void doVLine(){
+		int x = getPosInt("Please pick a valid x coordinate");
+		int y = getPosInt("Please pick a valid y coordinate");
+		int z = getPosInt("Please pick a size for the line");
+		VLine V = new VLine(z);
+		V.paintOn(board, x,y );
+
+	}
+
+	public static void doFrame(){
+		int x = getPosInt("Please pick a valid x coordinate");
+		int y = getPosInt("Please pick a valid y coordinate");
+		int w = getPosInt("Please pick a width");
+		int h = getPosInt("Please pick a height");
+		char c = getRealChar("Please pick a character");
+		Frame F = new Frame(h,w, c);
+		F.paintOn(board,x,y);
+	}
+
+	public static void doBox(){
+		int x = getPosInt("Please pick a valid x coordinate");
+		int y = getPosInt("Please pick a valid y coordinate");
+		int w = getPosInt("Please pick a width");
+		int h = getPosInt("Please pick a height");
+		char c = getRealChar("Please pick a character");
+		Box B = new Box(h,w, c);
+		B.paintOn(board,x,y);
+	}
+
+	public static void doTextLine(){
+		int x = getPosInt("Please pick a valid x coordinate");
+		int y = getPosInt("Please pick a valid y coordinate");
+		String text = getValidText("Please write something to enter");
+		TextLine T = new TextLine(text);
+		T.paintOn(board,x,y);
+	}
+
+	//	private static boolean goAgain(){
+	//		String answer;
+	//		Scanner r = new Scanner(System.in); 
+	//		do{
+	//			System.out.println("Would you like to enter another shape?");
+	//			System.out.println("(Enter yes or no)");
+	//			System.out.println("(no will quit the program)");
+	//			answer = r.nextLine();
+	//		}while(!answer.equalsIgnoreCase("Yes")&&!answer.equalsIgnoreCase("No"));
+	//
+	//		if(answer.equalsIgnoreCase("Yes"))
+	//			return true;
+	//		else
+	//			return false;
+	//	}
+
+	public static void optionsMenue(){
+		int shapeChosen = getShapeNumFromList("\nChoose an option from below: (pick a number) \n 1. Change Border Character \n 2. Clear Screen \n 3. Abandon Screen and Create New One \n 4. Create a Shape \n 5. Print Screen \n 6. Quit Program");
+		if (shapeChosen == 1){
+			chooseBorderChar("Please Select a border character");
+			optionsMenue();}
+		if (shapeChosen == 2){
+			board.clearScreen(board);
+			optionsMenue();}
+		if (shapeChosen == 3){
+			makeBoard();
+			optionsMenue();}
+		if (shapeChosen == 4);
+		//			thingsToDo();
+		if (shapeChosen == 5){
+			board.draw();
+			optionsMenue();}
+		if (shapeChosen == 6)
+			System.exit(0);
+	}
+
+	public static void chooseBorderChar(String string){
+		char c = getRealChar(string);
+		board.setBorderChar(c);
+	}
+
+	public static void main(String[] args){
+		Emulator e = new Emulator();
+		e.run();
+	}
+
+}

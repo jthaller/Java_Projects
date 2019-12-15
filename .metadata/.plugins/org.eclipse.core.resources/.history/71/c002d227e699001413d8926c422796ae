@@ -1,0 +1,63 @@
+import java.util.Scanner;
+
+public class Emulator extends Screen {
+
+	private static Scanner s = new Scanner(System.in);
+	private static Screen screen;
+
+	//	public String getStringFromList(){
+	//
+	//	}
+	//
+	//	public int getPosInt(){
+	//		return Math.abs(getInt());
+	//	}
+	//
+	//	public int getInt(){
+	//
+	//	}
+
+	public void Start(){
+		System.out.println("WELCOME TO THE SHAPES PROJECT \n-----------------------------");
+		createScreen();
+	}
+
+	public void createScreen(){
+
+		int num;
+		do
+		{
+			System.out.println("Please enter an integer <100 for the width of the screen");	
+			s.reset();
+			num = s.nextInt();
+
+		}
+		while(num >= 100 || num < 0);
+
+		//		if(num >= 0 && num <100){
+
+		setWidth((int)num);
+		//		}
+		
+		
+		do
+		{
+			System.out.println("Please enter an integer <100 for the height of the screen");
+			s.reset();
+			s.nextInt();
+		}
+		while(num >= 100 || num < 0);
+
+		//		if(num >= 0 && num <100){
+		setHeight((int)num);
+		//		}
+	}
+
+
+	public static void main(String[] args){
+		Emulator e = new Emulator();
+		e.Start();
+
+	}
+
+}

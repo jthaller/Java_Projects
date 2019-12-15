@@ -1,0 +1,233 @@
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
+
+
+
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
+import java.util.ArrayList;
+
+public class ShapeViewer{
+	private  ArrayList<Shape> shapes;
+	private double width;
+	private double height;
+	JFrame f = new JFrame();
+	Timer timer;
+	private int FPS;
+
+	public double getWidth()
+	{
+		return this.width;
+	}
+
+	public void setWidth(double w){
+		this.width = w;
+	}
+
+	public double getHeight(){
+		return this.height;
+	}
+
+	public void setHeight(double h){
+		this.height = h;
+	}
+
+	public int getFPS(){
+		return FPS;
+	}
+
+	public void setFPS(int FPS){
+		this.FPS = FPS;
+	}
+
+	public ShapeViewer(double width, double height) {	
+		this.width = width;
+		this.height = height;
+	}
+
+	public ArrayList<Shape> getShapes(){
+		return shapes;
+	}
+
+
+
+	public class ShapeComponent extends JComponent {
+		//private double theta = .1; //radians. default =.1
+		//private double height = getSize().getHeight();
+		//private double width = getSize().getWidth();
+		//this ^ should go elsewhere
+
+		public void paintComponent(Graphics g)
+		{
+			//recover Graphics2D
+			Graphics2D g2 = (Graphics2D) g;
+			//		Point2D.Double center = new Point2D.Double(getSize().getWidth()/2, getSize().getHeight()/2);
+
+			for(int i=0; i < shapes.size(); i++ ){
+				//				ArrayList<Line2D.Double> shapes = ShapeViewer.getLines(i); 
+								//pretty much use useless. will prob delete later
+				for(int j=0; j < shapes.get(i).drawShape(width,height).size(); j++)
+					g2.draw(shapes.get(i).drawShape(width,height).get(j));
+			}
+
+		}
+
+	}
+
+	public  void run(){
+
+		f.setSize(500,500);
+		f.setTitle("Rotation Project");
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		ShapeComponent comp = new ShapeComponent(); 
+		//Okay, in here do two things 1) deal with button layout if you're going to have more buttons
+		//2) put alllllll the action listeners (could declare them outside of the method but i don't think that matters)
+		//now, make slider and a timer (the slider clearl y chages the timer value) that every
+		// so often (couple times a second maybe) rotates all your shapes by some angle (arbitrary)
+
+		//Create the slider
+		int FPS_MIN = 0;
+		int FPS_MAX = 30;
+		int FPS_INIT = 5; //just so i can change around to mess with
+		JSlider speed = new JSlider(JSlider.HORIZONTAL,
+				FPS_MIN, FPS_MAX, FPS_INIT);
+		speed.addChangeListener(new SliderListenerSpeed()); //or (changelister) this
+		speed.setMajorTickSpacing(2);
+		speed.setMinorTickSpacing(1);
+		speed.setPaintTicks(true);
+		speed.setPaintLabels(true);
+		
+		JSlider sides = new JSlider(JSlider.HORIZONTAL, 1, 25, 1);
+		sides.setMajorTickSpacing(5);
+		sides.setMinorTickSpacing(1);
+		sides.setPaintTicks(true);
+		sides.setPaintLabels(true);
+		sides.addChangeListener(new SliderListenerSides());
+
+		JButton rotateButton = new JButton("Rotate Line");
+		rotateButton.addActionListener(new RotateListener());
+
+		JButton colorButton = new JButton("Change Color");
+		colorButton.addActionListener(new ColorListener());
+
+		JButton addShapeButton = new JButton("Add Shape");
+		addShapeButton.addActionListener(new AddShapeListener());
+		
+		JButton resetButton = new JButton("Reset");
+		resetButton.addActionListener(new ResetListener());
+
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.add(rotateButton);
+		buttonPanel.add(colorButton);
+		buttonPanel.add(addShapeButton);
+		buttonPanel.add(resetButton);
+		
+		JPanel sliderPanel = new JPanel();
+		sliderPanel.add(sides);
+		sliderPanel.add(speed);
+
+
+
+		//		ArrayList<Point2D.Double> points = new ArrayList<Point2D.Double>();
+		//		points.add(new Point2D.Double(0, f.getSize().getHeight()/2)); //starting pt1
+		//		points.add(new Point2D.Double(f.getSize().getWidth(), f.getSize().getHeight()/2)); //starting pt2
+		//
+		//		Shape shape = new Shape(points);
+
+		f.getContentPane().add(BorderLayout.SOUTH, buttonPanel);
+		f.getContentPane().add(BorderLayout.CENTER, comp);
+		f.getContentPane().add(BorderLayout.NORTH, sliderPanel);
+		//		f.add(comp);
+		f.setVisible(true);
+
+	}
+
+	class RotateListener implements ActionListener{
+		public void actionPerformed(ActionEvent e) {
+			rotate();
+			f.repaint();
+		}
+
+		public void rotate(){
+			timer = new Timer(FPS, this);
+			timer.start();
+			for(int i=0; i < shapes.size(); i++ ){
+				shapes.get(i).rotate(.2);
+			}
+		}
+	}
+
+	class SliderListenerSpeed implements ChangeListener {
+		public void stateChanged(ChangeEvent e) {
+			JSlider source = (JSlider)e.getSource();
+			if (!source.getValueIsAdjusting()) {
+				setFPS((int)source.getValue()); //this the best way????
+			}
+		}
+	}
+	
+	class SliderListenerSides implements ChangeListener {
+		public void stateChanged(ChangeEvent e) {
+			JSlider source = (JSlider)e.getSource();
+			if (!source.getValueIsAdjusting()) {
+				
+			}
+		}
+	}
+
+	class ColorListener implements ActionListener{
+		public void actionPerformed(ActionEvent event){
+			int red = (int) (Math.random() * 256);
+			int green = (int) (Math.random() * 256);
+			int blue = (int) (Math.random() * 256);
+
+			Color randomColor = new Color(red, green, blue);
+			for(int i=0; i < shapes.size(); i++ ){
+				shapes.get(i).setColor(randomColor); //the fuck is this?
+			}
+		}
+	}
+
+	class AddShapeListener implements ActionListener{
+		public void actionPerformed(ActionEvent e){
+
+		}
+	}
+	
+	class ResetListener implements ActionListener{
+		public void actionPerformed(ActionEvent e){
+			reset();
+		}
+		
+	}
+	
+	public void reset(){
+		run(); //too lazy? I think that should work though
+	}
+
+
+	public static void main(String[] args){
+		ShapeViewer a = new ShapeViewer(500,600);
+		a.run();
+	}
+
+}

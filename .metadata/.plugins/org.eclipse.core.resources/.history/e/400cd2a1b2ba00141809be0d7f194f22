@@ -1,0 +1,201 @@
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
+
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import Viewer.ColorListener;
+import Viewer.RotateListener;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
+import java.util.ArrayList;
+
+public class ShapeViewer{
+	private  ArrayList<Shape> shapes;
+	private double width;
+	private double height;
+	JFrame f = new JFrame();
+	Timer timer;
+
+	public double getWidth()
+	{
+		return this.width;
+	}
+	public void setWidth(double w){
+		this.width = w;
+	}
+	public double getHeight(){
+		return this.height;
+	}
+	public void setHeight(double h){
+		this.height = h;
+	}
+
+	//I'd suggest storing length and width and have a constructor that takes that in
+	//okay so now, the component thing is done and to do it bare bones, we just need to add event/action listeners
+	//can I steal those from her "viewer" class
+	//uhh no/i don't know how what the fuck she did
+	//also i haven't written a gui in a LONG time so we'll see how this goes...
+	//first things first, lets have a method that initializes the board
+	public ShapeViewer(double width, double height) {	
+		this.width = width;
+		this.height = height;
+	}
+
+	public ArrayList<Shape> getShapes(){
+		return shapes;
+	}
+
+
+
+	public class ShapeComponent extends JComponent {
+		//private double theta = .1; //radians. default =.1
+		//private double height = getSize().getHeight();
+		//private double width = getSize().getWidth();
+		//this ^ should go elsewhere
+
+		//use setTheta to speed up rotation?
+
+		public void paintComponent(Graphics g)
+		{
+			//recover Graphics2D
+			Graphics2D g2 = (Graphics2D) g;
+			//		Point2D.Double center = new Point2D.Double(getSize().getWidth()/2, getSize().getHeight()/2);
+
+			for(int i=0; i < shapes.size(); i++ ){
+				//				ArrayList<Line2D.Double> shapes = ShapeViewer.getLines(i); 
+				// this line above is useless now right? beCAUse it has access to shapes so I don't need to create it?
+				//technically it saves computational time but wastes memory, but yeah, its usless
+				//also why do you keep counting to size-1.....um because I wasn't doing that but then you did for one and I couldn't
+				//figure out why it had a -1 so I have just been shrugging and saying, "eh, I make sure that's actually right later"
+				// -_-lolololol
+				//where are width and height declared?
+				//is that what WIDTH means? before, I just called width, becuase width was literally getsize().getwidth() of the screen
+				//yeah but where is "width" declared?
+				//um, I suppose in the setSize
+				//I bet that this "width and height" are actually what we want
+				//so lets just declare our own and change the valeu whenever useful
+				for(int j=0; j < shapes.get(i).drawShape(width,height).size(); j++)
+					g2.draw(shapes.get(i).drawShape(width,height).get(j));
+			}
+
+		}
+
+	}
+
+	//ie this, perfect lol
+	//So first thing we want to add would be okay yeah that stuff is fine,well, mostly actually yeah
+	//well it should probably default draw a line we'll get to that later
+	//okay so i don't know how kevin did this
+	//but i know it works so we'll do it his way
+	//sound good? yeah. I'm curious anyway
+	public  void run(){
+
+		f.setSize(500,500);
+		f.setTitle("Rotation Project");
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		ShapeComponent comp = new ShapeComponent(); // why did it like it here? wasn't it unlined below? //because magic? honestly i have no idea
+		//but we need it up here anyways lol something to do with adding it to the frame it doesn't like
+		//magic
+
+		//Okay, in here you're going to do two things 1) deal with button layout if you're going to have more buttons
+		//2) put alllllll the action listeneres (you could declarre them outside of the method but i don't think that matters)
+		//So now, im going to leave you and you're goint to make slider and a timer ( the slider clearl y chages the timer value) that every
+		// so often (couple times a second maybe) rotates all your shapes by some angle (arbitrary)
+
+		//Create the slider
+		int FPS_MIN = 0;
+		int FPS_MAX = 20;
+		int FPS_INIT = 3; //just so i can change around to mess with
+		JSlider framesPerSecond = new JSlider(JSlider.HORIZONTAL,
+				FPS_MIN, FPS_MAX, FPS_INIT);
+		framesPerSecond.addChangeListener((ChangeListener) this);
+		framesPerSecond.setMajorTickSpacing(10);
+		framesPerSecond.setPaintTicks(true);
+
+		//Create the label table
+		Hashtable labelTable = new Hashtable();
+		labelTable.put( new Integer( 0 ), new JLabel("Stop") );
+		labelTable.put( new Integer( FPS_MAX/10 ), new JLabel("Slow") );
+		labelTable.put( new Integer( FPS_MAX ), new JLabel("Fast") );
+		framesPerSecond.setLabelTable( labelTable );
+
+		framesPerSecond.setPaintLabels(true);
+
+		JButton rotateButton = new JButton("Rotate Line");
+		rotateButton.addActionListener(new RotateListener());
+
+		JButton colorButton = new JButton("Change Color");
+		colorButton.addActionListener(new ColorListener());
+
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.add(rotateButton);
+		buttonPanel.add(colorButton);
+
+
+
+
+
+
+
+		ArrayList<Point2D.Double> points = new ArrayList<Point2D.Double>();
+		points.add(new Point2D.Double(0, f.getSize().getHeight()/2)); //starting pt1
+		points.add(new Point2D.Double(f.getSize().getWidth(), f.getSize().getHeight()/2)); //starting pt2
+
+		Shape shape = new Shape(points);
+
+		f.add(comp);
+		f.setVisible(true);
+
+	}
+
+	class RotateListener implements ActionListener{
+		public void actionPerformed(ActionEvent e) {
+			rotate();
+			f.repaint();
+		}
+
+		public void rotate(){
+			timer = new Timer(50, this);
+			timer.start();
+			for(int i=0; i < shapes.size(); i++ ){
+				shapes.get(i).rotate(.2);//.2??????? it's in radians right? so .2 would be okay probably???
+			}
+		}
+	}
+
+	static class SliderListener implements ChangeListener {
+		public void stateChanged(ChangeEvent e) {
+			JSlider source = (JSlider)e.getSource();
+			if (!source.getValueIsAdjusting()) {
+				int fps = (int)source.getValue();
+			}
+		}
+
+
+
+
+
+		public static void main(String[] args){
+			ShapeViewer a = new ShapeViewer(500,600);
+			a.run();
+
+		}
+
+	}
+}

@@ -1,0 +1,23 @@
+#BlueJ class context
+comment0.params=controlWindow
+comment0.target=Board(GameWindow)
+comment0.text=\ Ctor\:\ Board\n\ Params\:\ GameWindow\ \n\ \n\ Ctor\ sets\ the\ instant\ GameWindow\ wordsPlayed\ \n
+comment1.params=which
+comment1.target=void\ buttonClicked(javax.swing.JButton)
+comment2.params=
+comment2.target=void\ resetBoardColor()
+comment3.params=
+comment3.target=java.lang.String\ getLetters()
+comment4.params=letters
+comment4.target=java.lang.String\ randomizeLetters(java.lang.String[][])
+comment5.params=desiredLetters
+comment5.target=void\ setLetters(java.lang.String)
+comment6.params=word
+comment6.target=int\ wordScore(java.lang.String)
+comment7.params=
+comment7.target=void\ disable()
+comment8.params=
+comment8.target=void\ enable()
+comment9.params=word
+comment9.target=boolean\ checkWord(java.lang.String)
+numComments=10

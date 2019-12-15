@@ -1,0 +1,51 @@
+import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
+import java.util.ArrayList;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+
+
+public class ShapeComponent extends JComponent {
+	private double theta = .1; //radians. default =.1
+	private double height = getSize().getHeight();
+	private double width = getSize().getWidth();
+	
+	
+	//use setTheta to speed up rotation?
+	public void setTheta(double theta)
+	{
+		this.theta = theta;
+	}
+	
+	
+	
+	public void paintComponent(Graphics g)
+	{
+		Point2D.Double center = new Point2D.Double(getSize().getWidth()/2, getSize().getHeight()/2);
+		//recover Graphics2D
+		Graphics2D g2 = (Graphics2D) g;
+		
+		Shape shape = new Shape(points,center);
+		shape.drawShape(width,height); //returns Arraylist<Line2D.double>
+		shape.rotate(theta);
+		
+	}
+	
+//	public ShapeComponent(ArrayList<Double> shape) {
+//		super();
+//	}
+//
+//	public ShapeComponent(ArrayList<Double> shape, Double center) {
+//		super();
+//	}
+	
+	
+	
+	public static void main(String[] args){
+		
+	}
+
+}

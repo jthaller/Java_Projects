@@ -1,0 +1,20 @@
+#BlueJ class context
+comment0.params=theRow\ theColumn
+comment0.target=BoggleButton(int,\ int)
+comment1.params=
+comment1.target=int\ getRow()
+comment2.params=
+comment2.target=int\ getColumn()
+comment3.params=other
+comment3.target=boolean\ isAdjacentTo(BoggleButton)
+comment4.params=
+comment4.target=void\ setRed()
+comment5.params=
+comment5.target=void\ setBlue()
+comment6.params=
+comment6.target=void\ setBlack()
+comment7.params=newColor
+comment7.target=void\ setColor(java.lang.String)
+comment8.params=
+comment8.target=java.lang.String\ getColor()
+numComments=9

@@ -1,0 +1,337 @@
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.geom.Point2D;
+
+
+
+
+
+
+
+
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
+import java.util.ArrayList;
+
+public class ShapeViewer{
+	private  ArrayList<Shape> shapes;
+	private double width;
+	private double height;
+	JFrame f = new JFrame();
+	Timer timer;
+	private int FPS;
+
+	public double getWidth()
+	{
+		return this.width;
+	}
+
+	public void setWidth(double w){
+		this.width = w;
+	}
+
+	public double getHeight(){
+		return this.height;
+	}
+
+	public void setHeight(double h){
+		this.height = h;
+	}
+
+	public int getFPS(){
+		return FPS;
+	}
+
+	public void setFPS(int FPS){
+		this.FPS = FPS;
+	}
+
+	public ShapeViewer(double width, double height) {	
+		this.width = width;
+		this.height = height;
+	}
+
+	public ArrayList<Shape> getShapes(){
+		return shapes;
+	}
+
+
+
+	public class ShapeComponent extends JComponent {
+		//private double theta = .1; //radians. default =.1
+		//private double height = getSize().getHeight();
+		//private double width = getSize().getWidth();
+		//this ^ should go elsewhere
+
+		public void paintComponent(Graphics g)
+		{
+			//recover Graphics2D
+			Graphics2D g2 = (Graphics2D) g;
+			//		Point2D.Double center = new Point2D.Double(getSize().getWidth()/2, getSize().getHeight()/2);
+		
+			//Rectangle a = new Rectangle(0,0,10,10);
+			//g2.draw(a);
+			
+			for(int i=0; i < shapes.size(); i++ ){
+				//				ArrayList<Line2D.Double> shapes = ShapeViewer.getLines(i); 
+				//pretty much use useless. will prob delete later
+				for(int j=0; j < shapes.get(i).drawShape(width,height).size(); j++)
+				{
+					System.out.println(shapes.get(i).drawShape(width,height).get(j).getX1());
+					System.out.println(shapes.get(i).drawShape(width,height).get(j).getX2());
+					System.out.println(shapes.get(i).drawShape(width,height).get(j).getY1());
+					System.out.println(shapes.get(i).drawShape(width,height).get(j).getY2());
+
+
+					g2.draw(shapes.get(i).drawShape(width,height).get(j));
+				}
+
+				//I just want to see where the center is
+				g2.setColor(Color.RED);
+				g2.draw(new Line2D.Double(shapes.get(i).getCenterX()*width,shapes.get(i).getCenterY()*height,
+						shapes.get(i).getCenterX()*width+10,shapes.get(i).getCenterY()*height+10));
+				g2.setColor(Color.BLACK);
+				// okay so something is wrong with the visibility, lets try drawing something arbitraty
+				//this is where it would be drawn right? so  it's not getting here?
+				//or shapes is empty
+				// So um, what the fuck haha?
+				// whats width/height intialized to?
+			}
+
+		}
+
+	}
+
+	public void run(){
+		//you're going to have to unhardcode this later
+		f.setSize(500,600);
+		//		f.setMinimumSize(new Dimension(50,100));
+		f.setTitle("Rotation Project");
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		timer = new Timer(FPS,new TimerListener()); // other option is to make shapeviewer abstract and extent it to actionlistener
+
+		ShapeComponent comp = new ShapeComponent(); 
+
+		//Create the slider
+		int FPS_MIN = 0;
+		int FPS_MAX = 30;
+		int FPS_INIT = 5; //just so i can change around to mess with
+		JSlider speed = new JSlider(JSlider.HORIZONTAL,
+				FPS_MIN, FPS_MAX, FPS_INIT);
+		speed.addChangeListener(new SliderListenerSpeed()); //or (changelister) this
+		speed.setMajorTickSpacing(10);
+		speed.setMinorTickSpacing(2);
+		speed.setPaintTicks(true);
+		speed.setPaintLabels(true);
+		JLabel label = new JLabel("Speed");
+		f.add(label);
+
+
+		JSlider sides = new JSlider(JSlider.HORIZONTAL, 1, 10, 1);
+		sides.setMajorTickSpacing(9);
+		sides.setMinorTickSpacing(1);
+		sides.setPaintTicks(true);
+		sides.setPaintLabels(true);
+		sides.addChangeListener(new SliderListenerSides());
+
+
+		JButton rotateButton = new JButton("Rotate Line");
+		rotateButton.addActionListener(new RotateListener());
+
+		JButton colorButton = new JButton("Change Color");
+		colorButton.addActionListener(new ColorListener());
+
+		JButton addShapeButton = new JButton("Add Shape");
+		addShapeButton.addActionListener(new AddShapeListener());
+
+		JButton resetButton = new JButton("Reset");
+		resetButton.addActionListener(new ResetListener());
+
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.add(rotateButton);
+		buttonPanel.add(colorButton);
+		buttonPanel.add(addShapeButton);
+		buttonPanel.add(resetButton);
+
+		JPanel sliderPanel = new JPanel();
+		sliderPanel.add(sides);
+		sliderPanel.add(speed);
+
+		
+		
+		ArrayList<Point2D.Double> points = new ArrayList<Point2D.Double>();
+		points.add(new Point2D.Double(0, 0)); //starting pt1
+		points.add(new Point2D.Double(1,1)); //starting pt2, I'm an idiot lol, forgot thats how we wrote this
+
+		
+		Shape shape = new Shape(points);
+		shapes = new ArrayList<Shape>();
+		shapes.add(shape);
+		
+
+		f.addComponentListener(new ComponentAdapter(){
+			public void componentResized(ComponentEvent e){
+				setHeight(f.getSize().getHeight());
+				setWidth(f.getSize().getWidth());
+			}
+		});
+
+		f.getContentPane().add(BorderLayout.CENTER, comp);
+		f.getContentPane().add(BorderLayout.NORTH, sliderPanel);
+		f.getContentPane().add(BorderLayout.SOUTH, buttonPanel);
+		//		f.add(comp);
+		f.setVisible(true);
+
+	}
+
+	// okay this is for the timer so we'll rename it
+	class TimerListener implements ActionListener{
+		public void actionPerformed(ActionEvent e) {
+			rotate();
+			f.repaint();
+			//lol okay good just making sure you called repaint
+		}
+	}
+	//um what the fuck is going on here?
+	// 1) i'd suggest making rotate outside for good sytle( no one actually cares)
+	// 2) is this making a new timer every time a timer event occurs....uhhh damnit. I copied this bit from her code..
+	// what did i tell you about her code. hey you said the only thing she got right was the rotate method
+	// i said she got it to rotate, i didn't say she did it properly hahaa
+	// So um inside of run you're going to have to make timer
+	// and then use that with the slider, I really have no idea what teh fuck this is
+	// you can leave the action preformed method, thats nto wrong
+	// and i'd suggest moving rotate out
+	// (nless i forget how visibility works) in which case move it back in lol
+	// annd rotate should literall just be for(shapes){shapes.get(i).roate(.2 or something)
+	// so go do that haha I'm going to go do a chem problem, let me know once youv'e written this k have fun cheming
+
+	class RotateListener implements ActionListener{
+		public void actionPerformed(ActionEvent e) {
+			timer.start();
+			//FUCKING FINALLY  haha So you're good now right? the rest is just fighinting gui, you understand buttons?
+			//um I can mess with them. but there's still the problem that it doesn't reach the edge of the screen.
+			// uhh yeah, not exactly sure what that is, if i had to be it has to do with layout and the "width" and height" not knowing
+			// where the actual edge is
+			// you're going to have to update "width" and "height" everytime the screen resizes btw
+			// so first, figure out what the actual width and height of the viewing area are
+			// and then add a resize listener and everytime the screen resizes rest width and height and repaint
+			// make sense? i think so
+		}
+	}
+	//look up resize listeners i think they're slightly differnt i forget how they work
+	// good luck
+	// i'll be on facebook once you get this to work haha, at least its rotating properly now
+	//thanks
+
+	public void rotate(){ // ie send this a direction "dir" and rotate by .2*dir where dir E{-1,1} gotcha
+		for(int i=0; i < shapes.size(); i++ ){
+			shapes.get(i).rotate(.02); //might change .2 for smoothness idk
+		}
+	}
+
+
+	class SliderListenerSpeed implements ChangeListener {
+		public void stateChanged(ChangeEvent e) {
+			JSlider source = (JSlider)e.getSource();
+			if (!source.getValueIsAdjusting()) {
+				setFPS((int)source.getValue()); //this the best way????
+			}
+		}
+	}
+	//hm so the moment i click rotate line, all my lines (x,y) become the same, lets look there
+
+	class SliderListenerSides implements ChangeListener {
+		public void stateChanged(ChangeEvent e) {
+			JSlider source = (JSlider)e.getSource();
+			if (!source.getValueIsAdjusting()) {
+				//wtf do I update? 
+			}
+		}
+	}
+
+	class ColorListener implements ActionListener{
+		public void actionPerformed(ActionEvent event){
+			int red = (int) (Math.random() * 256);
+			int green = (int) (Math.random() * 256);
+			int blue = (int) (Math.random() * 256);
+
+			Color randomColor = new Color(red, green, blue);
+			//			for(int i=0; i < shapes.size(); i++ ){
+			//				shapes.get(i).setColor(randomColor); 
+			//shapes.setColor(randomColor); //yeah somethings off with this class/method
+			//for(int i=0;i<shapes.size();i++)
+			//shapes.get(i).setColor(randomColor);
+			//fix this later lol hmm
+		}
+	}
+
+
+	class AddShapeListener implements ActionListener{
+		public void actionPerformed(ActionEvent e){
+
+		}
+	}
+
+	class ResetListener implements ActionListener{
+		public void actionPerformed(ActionEvent e){
+			reset();
+		}
+	}
+
+
+
+	private void reset() {
+		//nothing seems to work. I want to just call run() again	
+	}
+
+
+
+
+	public static void main(String[] args){
+		//you're throwing a null pointers
+		//did you ever put anything into "shapes".....
+		//did you ever initialize it?
+		//its close to 500 thats fine
+		//so clearly, something is wrong
+		//1) youre ∆y = 0 so you would only draw a point
+		//2) 250000 seems like a bit of over kill but technicall shouldn't cause the error
+		//what code needs to be fixed?
+		//is something messing up where it thinks the center is?
+		// haven't looked into that yet, it could be an issue
+		// but one of your methods is really wrong right now
+		// I know what it is haha, i'm asking you to figure it out
+		//I wnat to say something is messing up inside the run
+		//hint: the issue isn't in this class
+		// / the issue we're going to fix first, there are multiple issues here too lol
+		// but the first one we need to isnt here
+
+		//where are with and height being intiated
+
+		ShapeViewer a = new ShapeViewer(500,600);
+		a.run();
+	}
+
+}

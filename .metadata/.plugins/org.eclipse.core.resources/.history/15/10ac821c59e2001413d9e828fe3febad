@@ -1,0 +1,256 @@
+import java.util.ArrayList;
+
+/*
+ * Puzzle class (actually runs the game) 
+Some form of storing puzzle Pieces
+private Board board
+Puzzle(int width, int height, Pieces… pieces)
+Piece clearCell(int row, int col)
+Piece setCell(int row, int col, Piece piece)
+Piece getCell(int row, int col)
+ArrayList<Piece> pieceBank() // gives back list of remaining pieces
+boolean isSolved()
+void solve() //algorithm, can have helper methods
+boolean isValidFit(int row, int col, Piece piece)
+String toString()
+ */
+public class Puzzle2 {
+	
+	private Board board;
+	private ArrayList<Piece> PiecesNotOnBoard;
+	private ArrayList<Piece> pieces;
+	
+	public Puzzle2(int width, int height, Piece...pieces){
+		this.board = new Board(width, height);
+		this.PiecesNotOnBoard = new ArrayList<Piece>();
+		this.pieces = new ArrayList<Piece>();
+		for(int i=0; i<pieces.length;i++){
+			this.pieces.add(pieces[i]);
+			PiecesNotOnBoard.add(pieces[i]);
+		}
+	}
+	
+	public Piece clearCell(int row, int col){
+		if(board.isValid(row, col)){
+			if(board.isOccupied(row, col)){
+				PiecesNotOnBoard.add(getCell(row, col));
+				return board.clearCell(row, col);
+			}
+		}
+		return null;
+	}
+	
+	public Piece setCell(int row , int col, Piece piece){
+		if(isValidFit(row, col, piece)){
+			if(board.isOccupied(row, col)){
+				PiecesNotOnBoard.add(board.getCell(row, col));
+			}
+			if(PiecesNotOnBoard.contains(piece)){
+				PiecesNotOnBoard.remove(piece);
+			}
+			return board.setCell(row, col, piece);
+			}	
+		
+		return null;
+	}	
+	
+	public Piece getCell(int row, int col){
+		if(board.isValid(row, col))
+			if(board.isOccupied(row, col))
+				return board.getCell(row,  col);
+		return null;
+	}
+	
+	public ArrayList<Piece> pieceBank(){
+		return PiecesNotOnBoard; 
+	}
+	
+	public boolean isSolved(){
+		for(int i = 0; i<board.getHeight();i++){
+			for(int j = 0; j<board.getWidth();j++){
+				if(board.getCell(i, j)==null)
+					return false;
+			}
+		}
+		return true;
+	}
+	
+	public void solve(){
+		clear();
+		for(int i=0; i<board.getHeight();i++){
+			for(int j=0; j<board.getWidth();j++){
+				for(int k=0; k<PiecesNotOnBoard.size();k++){
+					for(int l=0; l<4;l++){
+						setCell(i,j,PiecesNotOnBoard.get(k));
+						if(PiecesNotOnBoard.size() ==0) return;
+						if(!isOccupied(i, j)){
+							PiecesNotOnBoard.get(k).rotate(1);
+						}
+						if(isOccupied(i, j)){
+							l=5;
+							k=PiecesNotOnBoard.size();
+						}
+					}
+				}
+			}
+		}
+		System.out.println(board.toString());
+		System.out.println(pieceBank());
+		System.out.println(pieces());
+		if(isSolved()==false){
+//			clear();
+			PiecesNotOnBoard = pieces();
+			System.out.println(pieceBank());
+//			Piece piece = PiecesNotOnBoard.get(0);
+//			PiecesNotOnBoard.remove(0);
+//			System.out.println(pieceBank());
+//			PiecesNotOnBoard.add(piece);
+//			PiecesNotOnBoard.get(0).rotate(1);
+//			System.out.println(pieceBank());
+			solve();
+		}
+	}
+	
+	private ArrayList<Piece> pieces(){
+		Piece piece =  pieces.get(0);
+		pieces.remove(0);
+		pieces.add(piece);
+		return pieces;
+	}
+	
+	public boolean isOccupied(int row, int col){
+		if(board.isValid(row, col)){
+			if(board.isOccupied(row, col)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean isValidFit(int row, int col, Piece piece){
+		if(!isValid(row,col)){
+			return false;
+		}
+		if(isValid(row-1, col)){
+			if(board.getCell(row-1, col)!=null&&board.getCell(row-1, col).getSouth()+piece.getNorth()!=0){
+				return false;
+			}
+		}
+		if(isValid(row, col-1)){
+			if(board.getCell(row,col-1)!=null&&board.getCell(row,col-1).getEast()+piece.getWest()!=0){
+				return false;
+			}
+		}
+		if(isValid(row+1, col)){
+			if(board.getCell(row+1, col)!=null&&board.getCell(row+1,col).getNorth()+piece.getSouth()!=0){
+				return false;
+			}
+		}
+		if(isValid(row, col+1)){
+			if(board.getCell(row, col+1)!=null&&board.getCell(row,col+1).getWest()+piece.getEast()!=0){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private boolean isValid(int row, int col) {
+		return board.isValid(row, col);
+	}
+
+	public String toString(){
+		return board.toString();
+	}
+	
+	public void clear(){
+		for(int i=0; i<board.getWidth();i++){
+			for(int j=0; j<board.getHeight();j++){
+				clearCell(i, j);
+			}
+		}
+	}
+	
+	public static void main(String[] args){
+		Piece pp1 = new Piece(1,3,-2,-1);
+		Piece pp2 = new Piece(4,2,-4,-3);
+		Piece pp3 = new Piece(3,4,-4,-1);
+		Piece pp4 = new Piece(3,2,-1,-1);
+		Piece pp5 = new Piece(4,4,-3,-1);
+		Piece pp6 = new Piece(3,2,-2,-3);
+		Piece pp7 = new Piece(4,2,-3,-2);
+		Piece pp8 = new Piece(1,3,-4,-3);
+		Piece pp9 = new Piece(1,2,-1,-2);
+		Puzzle a = new Puzzle(3, 3, pp1, pp2, pp3, pp4, pp5, pp6, pp7, pp8, pp9);
+		System.out.println(a.toString());
+		System.out.println("\n");
+		System.out.println(a.pieceBank());
+		a.setCell(0, 0, pp4);
+		System.out.println(a.toString());
+		System.out.println(a.pieceBank());
+		a.setCell(1, 0, pp1);
+		System.out.println(a.toString());
+		a.setCell(0, 1, pp7);
+		System.out.println(a.toString());
+		a.clear();
+		System.out.println(a.toString());
+		a.solve();
+		System.out.println(a.toString());
+	}
+
+}
+
+
+
+
+
+
+
+//if(board.isValid(row, col)){
+//if(row==0){
+//	if(col==0){
+//		if(board.getCell(row+1, col)!=null&&board.getCell(row, col+1)!=null){
+//			if(piece.getSouth()+board.getCell(row, col+1).getNorth()==0&& piece.getEast()+board.getCell(row+1, col).getWest()==0){
+//				return true;
+//			}
+//		}
+//	}
+//	if(board.getCell(row+1, col)!=null&&board.getCell(row, col+1)!=null&&board.getCell(row, col-1)!=null){
+//		if(piece.getSouth()+board.getCell(row, col+1).getNorth()==0&& piece.getEast()+board.getCell(row+1, col).getWest()==0 && piece.getWest()+board.getCell(row-1, col).getEast()==0){
+//			return true;
+//		}
+//	}
+//}
+//if(col==0){
+//	if(board.getCell(row+1, col)!=null&&board.getCell(row, col+1)!=null&&board.getCell(row-1, col)!=null){
+//		if(piece.getSouth()+board.getCell(row, col+1).getNorth()==0&& piece.getEast()+board.getCell(row+1, col).getWest()==0 && piece.getNorth()+board.clearCell(row, col+1).getSouth()==0){
+//			return true;
+//		}
+//	}
+//}
+//if(row==board.getWidth()){
+//	if(col==board.getHeight()){
+//		if(board.getCell(row-1, col)!=null&&board.getCell(row, col-1)!=null){
+//			if(piece.getNorth()+board.getCell(row, col-1).getSouth()==0&&piece.getWest()+board.getCell(row-1, col).getEast()==0){
+//				return true;
+//			}
+//		}
+//	}
+//	if(board.getCell(row-1, col)!=null&&board.getCell(row, col-1)!=null&&board.getCell(row, col+1)!=null){
+//		if(piece.getNorth()+board.getCell(row, col-1).getSouth()==0&&piece.getWest()+board.getCell(row-1, col).getEast()==0&&piece.getEast()+board.getCell(row, col+1).getWest()==0){
+//			return true;
+//		}
+//	}
+//}
+//if(col==board.getHeight()){
+//	if(board.getCell(row-1, col)!=null&&board.getCell(row, col-1)!=null&&board.getCell(row, col)!=null){
+//		if(piece.getNorth()+board.getCell(row, col-1).getSouth()==0&&piece.getWest()+board.getCell(row-1, col).getEast()==0&&piece.getSouth()+board.getCell(row+1, col).getWest()==0){
+//			return true;
+//		}
+//	}
+//}
+//if(piece.getSouth()+board.getCell(row, col+1).getNorth()==0&& piece.getEast()+board.getCell(row+1, col).getWest()==0 && piece.getNorth()+board.clearCell(row, col+1).getSouth()==0&&piece.getWest()+board.getCell(row+1, col).getEast()==0){
+//	return true;
+//}else
+//	return false;
+//}
+//return false;

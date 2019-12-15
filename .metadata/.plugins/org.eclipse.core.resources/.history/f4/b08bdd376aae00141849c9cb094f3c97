@@ -1,0 +1,25 @@
+import java.awt.List;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+
+
+public class ShapeComponent {
+
+	public ArrayList<Point2D.Double> shape;
+	double x1;
+	double y1;
+	
+
+	public void rotate(double theta){
+		Point2D.Double Coord2;
+		for (int i=0; i < component.size().Height(); i++)
+		shape.set(i,Point2D.Double)
+		
+		double x2 = (double)(x1 * Math.cos(Math.toRadians(theta))) - (double)(y1 * Math.sin(Math.toRadians(theta))));
+		double y2 = (double)(x1 * Math.sin(Math.toRadians(theta))) + (double)(y1 * Math.cos(Math.toRadians(theta)));
+	}
+		
+	 public void rotate(double degrees) {
+	        for(ShapeComponent c: shape){
+	           c.rotate(degrees);
+}

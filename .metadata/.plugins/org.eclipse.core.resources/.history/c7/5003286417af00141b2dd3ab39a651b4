@@ -1,0 +1,31 @@
+import java.awt.geom.Point2D.Double;
+import java.util.ArrayList;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import javax.swing.JComponent;
+
+
+public class ShapeComponent extends JComponent {
+
+	public void paintComponent(Graphics g)
+	{
+		Graphics2d g2 = (Graphics2d) g;
+		
+	}
+	
+	public ShapeComponent(ArrayList<Double> shape) {
+		super(shape);
+		// TODO Auto-generated constructor stub
+	}
+
+	public ShapeComponent(ArrayList<Double> shape, Double center) {
+		super(shape, center);
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+	public static void main(String[] args){
+		
+	}
+
+}

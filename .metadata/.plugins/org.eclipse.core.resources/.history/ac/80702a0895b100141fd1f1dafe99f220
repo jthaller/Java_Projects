@@ -1,0 +1,55 @@
+import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
+
+import javax.swing.JFrame;
+
+import java.util.ArrayList;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+
+public class ShapeViewer{
+	private static ArrayList<Line2D.Double> lines;
+	private static ArrayList<Shape> shapes;
+
+	public ShapeViewer() {	
+	}
+	
+	public static Shape getLines(int n){
+		return shapes.get(n);
+	}
+	
+	public static ArrayList<Shape> getShapes(){
+		return shapes;
+	}
+	
+	public void setShape(Shape shape){
+		
+	}
+	
+	public static void run(){
+		JFrame frame = new JFrame();
+		frame.setSize(500,500);
+		frame.setTitle("Rotation Project");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+
+		ArrayList<Point2D.Double> points = new ArrayList<Point2D.Double>();
+		points.add(new Point2D.Double(0, frame.getSize().getHeight()/2)); //starting pt1
+		points.add(new Point2D.Double(frame.getSize().getWidth(), frame.getSize().getHeight()/2)); //starting pt2
+		
+		Shape shape = new Shape(points);
+		
+		ShapeComponent component = new ShapeComponent();
+		frame.add(component);
+		frame.setVisible(true);
+		
+		shape.rotate(theta);
+	}
+	
+	public static void main(String[] args){
+			
+	
+	}
+
+}

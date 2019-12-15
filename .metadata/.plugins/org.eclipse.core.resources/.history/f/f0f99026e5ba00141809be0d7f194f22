@@ -1,0 +1,82 @@
+
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+
+
+public class Shape {
+
+	private ArrayList<Point2D.Double> points;
+	private double centerX;
+	private double centerY;
+	
+	public Shape(ArrayList<Point2D.Double> points){
+		this.points=points;
+		double x =0;
+		double y =0;
+		for(int i = 0; i<points.size();i++)
+		{
+			x+= points.get(i).getX();
+			y+= points.get(i).getY();
+		
+		}
+		this.centerX = x/points.size();
+		this.centerY = y/points.size();
+	}
+	
+
+	public Shape(ArrayList<Point2D.Double> points, Point2D.Double center){
+		this.points=points;
+		center.setLocation(centerX,centerY);
+	}
+
+	
+	//inside your timer event, step over all your shapes and call shapes.get(i).rotate(whatever theta looks good)
+	public void rotate(double theta){ //theta is in radians. A Negative theta will rotate clockwise.  Positive rotates counterclockwise.
+		Point2D.Double Coord2 = new Point2D.Double();
+		for(int i=0; i < points.size(); i++){
+			double x2 = centerX + ((points.get(i).getX() - centerX) * Math.cos(theta)) - ((points.get(i).getY() - centerY) * Math.sin(theta));
+			double y2 = centerY + ((points.get(i).getX() - centerX) * Math.sin(theta)) + ((points.get(i).getY() - centerY) * Math.cos(theta));
+			Coord2.setLocation(x2,y2);
+			points.set(i,Coord2);
+		}
+	}
+	
+//	public ArrayList<Point2D.Double> toArrayList(ShapeComponent points){
+//		return this.points;
+//	}
+//	
+//	public int getSize(ShapeComponent points){
+//		return points.toArrayList(points).size();
+//	}
+	
+	//this is "get lines"
+	// wait gimme a sec, your error might not actuall be here i have another idea
+	//( this was the method but i think is correct let me read it)
+	public ArrayList<Line2D.Double> drawShape(double width, double height){
+		
+		ArrayList<Line2D.Double> lines = new ArrayList<Line2D.Double>();
+		for(int i=0; i< points.size()-1; i++){
+			
+			lines.add(new Line2D.Double(points.get(i).getX()*width,
+					points.get(i).getY()*height,
+					points.get(i+1).getX()*width,
+					points.get(i+1).getY()*height));
+		}
+		
+		lines.add(new Line2D.Double(points.get(0).getX()*width,
+				points.get(0).getY()*height,
+				points.get(points.size()-1).getX()*width,
+				points.get(points.size()-1).getY()*height));
+		return lines;
+	}
+
+	public static void main(String[] args){
+		Point2D.Double a = new Point2D.Double(1,0);
+		ArrayList<Point2D.Double> b = new ArrayList<Point2D.Double>();
+		b.add(a);
+		Shape test = new Shape(b);
+		test.rotate((Math.PI)*2);
+		System.out.println(b);
+	}
+}
